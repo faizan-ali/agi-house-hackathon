@@ -1,0 +1,2 @@
+REQUIREMENTS:
+`brew install sox`
