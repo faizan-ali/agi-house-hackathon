@@ -1,6 +1,6 @@
-import axios from "axios";
-
 require('dotenv').config();
+
+import axios from "axios";
 
 const express = require('express');
 const http = require('http');
@@ -10,7 +10,25 @@ const fs = require('fs');
 const path = require('path');
 import qs from 'qs';
 
-import {sdk} from '@symblai/symbl-js'
+let isFlashing = false
+
+const changeLights = async (color: 'Cool white' | 'Ocean' | 'Candlelight'): Promise<void> => {
+    await fetch("http://homeassistant.local:8123/api/services/light/turn_on", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJiOWRiYjhiYzlmZjU0ZjE4YjU2MGI1YzVhMmQxZTY3YiIsImlhdCI6MTcyNjM1NzYyNCwiZXhwIjoyMDQxNzE3NjI0fQ.FZBnmipg67NzY2G8CfR-HbRr9l_Sx8U-EIa-1PAsEHc"
+        },
+        body: JSON.stringify({
+            entity_id: "light.wiz_rgbw_tunable_4b588c",
+            effect: color
+        })
+    })
+}
+
+const wait = (ms: number) => {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 interface SentimentAnalysisResponse {
     topics: Array<{
@@ -28,6 +46,7 @@ interface SentimentAnalysisResponse {
         parentRefs: Array<any>
     }>
 }
+
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
@@ -45,8 +64,8 @@ const RECORD_DURATION = 8000; // Record for 30 seconds
 // Create directories for saving files
 const audioDir = path.join(__dirname, 'saved_audio');
 const transcriptionDir = path.join(__dirname, 'transcriptions');
-fs.mkdirSync(audioDir, { recursive: true });
-fs.mkdirSync(transcriptionDir, { recursive: true });
+fs.mkdirSync(audioDir, {recursive: true});
+fs.mkdirSync(transcriptionDir, {recursive: true});
 
 let accessToken = ''
 
@@ -144,8 +163,22 @@ async function processAudio(audioFilePath) {
         const sentimentAnalysis: SentimentAnalysisResponse = await getConversationData(conversationId, accessToken);
         const isNegative = sentimentAnalysis.topics.some(topic => topic.sentiment.polarity.score <= 0)
 
-        if (isNegative) {
-
+        if (isNegative && !isFlashing) {
+            isFlashing = true
+            await changeLights('Cool white')
+            await wait(500)
+            await changeLights('Ocean')
+            await wait(500)
+            await changeLights('Cool white')
+            await wait(500)
+            await changeLights('Ocean')
+            await wait(500)
+            await changeLights('Cool white')
+            await wait(500)
+            await changeLights('Ocean')
+            await wait(500)
+            await changeLights('Candlelight')
+            isFlashing = false
         }
 
     } catch (error) {
