@@ -66,7 +66,7 @@ const APP_SECRET = process.env.SYMBL_APP_SECRET;
 let microphone = null;
 
 // Audio settings
-const CHUNK_DURATION_IN_SECONDS = 3
+const CHUNK_DURATION_IN_SECONDS = 4
 const OVERLAP_DURATION_IN_SECONDS = 2
 
 let isRecording = false;
@@ -191,13 +191,11 @@ async function processAudio(audioFilePath) {
 
         // Get sentiment analysis
         const sentimentAnalysis: SentimentAnalysisResponse = await getConversationData(conversationId, accessToken);
-        const isNegative = sentimentAnalysis.topics.some(topic => topic.sentiment.polarity.score <= -0.5)
+        const isNegative = sentimentAnalysis.topics.some(topic => topic.sentiment?.polarity?.score && topic.sentiment?.polarity?.score <= -0.5)
 
         console.log(`SENTIMENT: ${isNegative ? 'NEGATIVE' : 'POSITIVE'}`)
 
         if (isNegative && !isFlashing) {
-            void changeLights('Cool white')
-
             if (!hasSaid) {
                 exec('say "Guys calm down, take three deep breaths"')
                 hasSaid = true
@@ -205,41 +203,37 @@ async function processAudio(audioFilePath) {
 
             isFlashing = true
             await changeLights('Romance')
-            await wait(500)
+            await wait(700)
             await changeLights('Cool white')
-            await wait(500)
+            await wait(700)
             await changeLights('Romance')
-            await wait(500)
+            await wait(700)
             await changeLights('Cool white')
-            await wait(500)
+            await wait(700)
             await changeLights('Romance')
-            await wait(500)
+            await wait(700)
             await changeLights('Cool white')
-            await wait(500)
+            await wait(700)
             await changeLights('Romance')
-            await wait(500)
+            await wait(700)
             await changeLights('Cool white')
-            await wait(500)
+            await wait(700)
             await changeLights('Romance')
-            await wait(500)
+            await wait(700)
             await changeLights('Cool white')
-            await wait(500)
+            await wait(700)
             await changeLights('Romance')
-            await wait(500)
+            await wait(700)
             await changeLights('Cool white')
-            await wait(500)
-            await changeLights('Cool white')
-            await wait(500)
+            await wait(700)
             await changeLights('Romance')
-            await wait(500)
+            await wait(700)
             await changeLights('Cool white')
-            await wait(500)
+            await wait(700)
             await changeLights('Romance')
-            await wait(500)
+            await wait(700)
             await changeLights('Cool white')
-            await wait(500)
-            await changeLights('Cool white')
-            await wait(500)
+            await wait(700)
             await changeLights('Romance')
             await wait(500)
             await changeLights('Cool white')
